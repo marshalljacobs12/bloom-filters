@@ -10,7 +10,7 @@
 #include <stdlib.h>
 
 #include "exampleConfig.h"
-#include "example.h"
+#include "BloomFilter.hpp"
 
 /*
  * Simple main program that demontrates how access
@@ -28,8 +28,8 @@ int main() {
             << std::endl;
   std::system("cat ../LICENSE");
 
-  // Bring in the dummy class from the example source,
-  // just to show that it is accessible from main.cpp.
-  Dummy d = Dummy();
-  return d.doSomething() ? 0 : -1;
+  std::cout << "Pre constructor" << std::endl;
+  BloomFilter<std::string> bf(100, 3);
+  std::cout << "Post constructor" << std::endl;
+  return 0;
 }

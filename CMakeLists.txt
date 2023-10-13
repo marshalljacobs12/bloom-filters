@@ -25,7 +25,6 @@ set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/")
 include(ConfigSafeGuards)
 include(Colors)
 include(CTest)
-include(Documentation)
 include(GTest)
 include(LTO)
 include(Misc)
@@ -38,12 +37,13 @@ find_lto(CXX)
 #                         Locate files (change as needed).
 # --------------------------------------------------------------------------------
 set(SOURCES          # All .cpp files in src/
-    src/example.cpp
+    src/BloomFilter.hpp
+    src/Bitmap.cpp
 )
-set(TESTFILES        # All .cpp files in tests/
-    tests/main.cpp
-)
-set(LIBRARY_NAME engine)  # Default name for the library built from src/*.cpp (change if you wish)
+# set(TESTFILES        # All .cpp files in tests/
+#     tests/main.cpp
+# )
+set(LIBRARY_NAME bloomfilter)  # Default name for the library built from src/*.cpp (change if you wish)
 
 # --------------------------------------------------------------------------------
 #                            Build! (Change as needed)
@@ -53,6 +53,7 @@ add_library(${LIBRARY_NAME} OBJECT ${SOURCES})
 
 # Lib needs its header files, and users of the library must also see these (PUBLIC). (No change needed)
 target_include_directories(${LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(${LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
 # There's also (probably) doctests within the library, so we need to see this as well.
 target_link_libraries(${LIBRARY_NAME} PUBLIC gtest gtest_main)
