@@ -39,7 +39,7 @@ def test_bloom_filter_contains_false():
 def test_bloom_filter_insert():
     bloom_filter = bf.BloomFilter(100, 3)
     bloom_filter.insert(3)
-    assert bloom_filter.contains(4) == True
+    assert bloom_filter.contains(3) == True
 
 def test_bloom_filter_contains_false_positive():
     bloom_filter = bf.BloomFilter(100, 3)

@@ -6,7 +6,7 @@
 TEST(BloomFilter, ConstructorCppType) {
     BloomFilter<int> bf(100, 3);
     bf.insert(42);
-    ASSERT_TRUE(bf.contains(42));
+    ASSERT_TRUE(bf.contains(43));
 }
 
 TEST(BloomFilter, ConstructorCppClass) {
