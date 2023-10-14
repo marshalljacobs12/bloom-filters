@@ -42,6 +42,7 @@ set(SOURCES          # All .cpp files in src/
     src/BloomFilter.hpp
     src/Bitmap.cpp
     src/CountingBloomFilter.hpp
+    src/ScalableBloomFilter.hpp
 )
 
 # set(TESTFILES        # All .cpp files in tests/
@@ -87,6 +88,7 @@ set(PYTHON_MODULE_SOURCES
   src/Bitmap.cpp
   src/BloomFilter.hpp
   src/CountingBloomFilter.hpp
+  src/ScalableBloomFilter.hpp
   src/bf.cpp
 )
 

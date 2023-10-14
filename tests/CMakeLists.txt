@@ -6,6 +6,7 @@ set(TESTFILES        # All .cpp files in tests/
     cpp/test_bloom_filter.cpp
     cpp/helpers.hpp
     cpp/test_counting_bloom_filter.cpp
+    cpp/test_scalable_bloom_filter.cpp
 )
 
 set(TEST_MAIN unit_tests)   # Default name for test executable (change if you wish).
