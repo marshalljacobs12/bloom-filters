@@ -39,7 +39,7 @@ build/
 .vscode/
 
 # python ignores
-*/__pycache__/
+tests/python/__pycache__/
 */.pytest_cache/
 */.mypy_cache/
 */.tox/

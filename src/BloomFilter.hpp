@@ -3,6 +3,7 @@
 #include <Bitmap.hpp>
 #include <memory>
 #include <functional>
+#include <stdexcept>
 
 // for debugging
 #include <iostream>
@@ -67,10 +68,18 @@ private:
 #endif
 
 #ifndef INCLUDE_PYBIND
+
+template <typename T, typename = void>
+struct is_hashable : std::false_type {};
+
+template <typename T>
+struct is_hashable<T, decltype(std::hash<T>{}(std::declval<T>()), void())> : std::true_type {};
+
 template <typename T>
 class BloomFilter {
 public:
     BloomFilter(size_t size, int num_hashes) : m_size(size), m_num_hashes(num_hashes) {
+        static_assert(is_hashable<T>::value,"Type T must be hashable with std::hash!");
         m_bitmap = std::make_unique<Bitmap>(m_size);
         if (m_num_hashes > 100) {
             m_num_hashes = 100;
