@@ -2,6 +2,7 @@
 #include "BloomFilter.hpp"
 #include "Bitmap.hpp"
 #include "CountingBloomFilter.hpp"
+#include "ScalableBloomFilter.hpp"
 
 namespace py = pybind11;
 
@@ -16,6 +17,10 @@ PYBIND11_MODULE(bf, m) {
         .def("contains", &CountingBloomFilter<py::object>::contains)
         .def("remove", &CountingBloomFilter<py::object>::remove)
         .def("count", &CountingBloomFilter<py::object>::count);
+    py::class_<ScalableBloomFilter<py::object>>(m, "ScalableBloomFilter")
+        .def(py::init<size_t, double, size_t, int>())
+        .def("insert", &ScalableBloomFilter<py::object>::insert)
+        .def("contains", &ScalableBloomFilter<py::object>::contains);
     // Exception translation
     py::register_exception_translator([](std::exception_ptr p) {
         try {
