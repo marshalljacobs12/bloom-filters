@@ -26,6 +26,9 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
+    
+    - name: Pull submodules
+      run: git submodule update --init --recursive
 
     - name: Configure (${{ matrix.configuration }})
       run: cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
