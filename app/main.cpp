@@ -31,5 +31,11 @@ int main() {
   std::cout << "Pre constructor" << std::endl;
   BloomFilter<std::string> bf(100, 3);
   std::cout << "Post constructor" << std::endl;
+  bf.insert("Hello");
+  bf.insert("World");
+  if (bf.contains("Hello"))
+    std::cout << "Hello is in the bloom filter" << std::endl;
+  if (!bf.contains("Goodbye"))
+    std::cout << "Goodbye is not in the bloom filter" << std::endl;
   return 0;
 }
