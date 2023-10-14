@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [ ci-debug, main ]
 
 jobs:
   build-and-test:
@@ -26,6 +26,9 @@ jobs:
     steps:
     - name: Checkout Code
       uses: actions/checkout@v2
+    
+    - name: Pull submodules
+      run: git submodule update --init --recursive
 
     - name: Configure (${{ matrix.configuration }})
       run: cmake -S . -Bbuild -DCMAKE_BUILD_TYPE=${{ matrix.configuration }}
@@ -33,8 +36,25 @@ jobs:
     - name: Build with ${{ matrix.compiler }}
       run: cmake --build build --config ${{ matrix.configuration }}
 
-    - name: Test
+    - name: Run C++ Tests
       working-directory: build
       env:
         CTEST_OUTPUT_ON_FAILURE: 1
       run: ctest -C ${{ matrix.configuration }}
+    
+    - name: Set up Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.10' 
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pytest
+
+    - name: Run pytest
+      env:
+        PYTHONPATH: ${{ env.PYTHONPATH }}:build
+      run: |
+        python -m pytest tests/python
+
