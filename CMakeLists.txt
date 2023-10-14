@@ -41,6 +41,7 @@ include_directories(include)
 set(SOURCES          # All .cpp files in src/
     src/BloomFilter.hpp
     src/Bitmap.cpp
+    src/CountingBloomFilter.hpp
 )
 
 # set(TESTFILES        # All .cpp files in tests/
@@ -85,6 +86,7 @@ add_subdirectory(extern/pybind11) # CHECK IF CAN DELETE
 set(PYTHON_MODULE_SOURCES 
   src/Bitmap.cpp
   src/BloomFilter.hpp
+  src/CountingBloomFilter.hpp
   src/bf.cpp
 )
 
