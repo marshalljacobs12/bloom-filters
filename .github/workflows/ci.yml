@@ -53,6 +53,8 @@ jobs:
         pip install pytest
 
     - name: Run pytest
+      env:
+        PYTHONPATH: ${{ env.PYTHONPATH }}:build
       run: |
         python -m pytest tests/python
 
