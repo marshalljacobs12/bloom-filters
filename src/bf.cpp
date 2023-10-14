@@ -10,12 +10,12 @@ PYBIND11_MODULE(bf, m) {
         .def(py::init<size_t, int>())
         .def("insert", &BloomFilter<py::object>::insert)
         .def("contains", &BloomFilter<py::object>::contains);
-    py::class_<CountingBloomFilter<py::object, 100>>(m, "CountingBloomFilter")
-        .def(py::init<int>())
-        .def("insert", &CountingBloomFilter<py::object, 100>::insert)
-        .def("contains", &CountingBloomFilter<py::object, 100>::contains)
-        .def("remove", &CountingBloomFilter<py::object, 100>::remove)
-        .def("count", &CountingBloomFilter<py::object, 100>::count);
+    py::class_<CountingBloomFilter<py::object>>(m, "CountingBloomFilter")
+        .def(py::init<size_t, int>())
+        .def("insert", &CountingBloomFilter<py::object>::insert)
+        .def("contains", &CountingBloomFilter<py::object>::contains)
+        .def("remove", &CountingBloomFilter<py::object>::remove)
+        .def("count", &CountingBloomFilter<py::object>::count);
     // Exception translation
     py::register_exception_translator([](std::exception_ptr p) {
         try {

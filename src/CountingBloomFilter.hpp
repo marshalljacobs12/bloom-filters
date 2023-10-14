@@ -4,36 +4,40 @@
 #include <memory>
 #include <functional>
 #include <stdexcept>
+#include <vector>
+#include <algorithm>
 
 // for debugging
 #include <iostream>
 
-template<typename T, std::size_t N>
+template<typename T, std::size_t N=0>
 class CountingBloomFilter;
 
 #ifdef INCLUDE_PYBIND
 #include <pybind11/pybind11.h>
-template <std::size_t N>
-class CountingBloomFilter<pybind11::object, N> {
+template <>
+class CountingBloomFilter<pybind11::object> {
 public:
-    CountingBloomFilter(int num_hashes) {
+    CountingBloomFilter(size_t size, int num_hashes) {
         m_num_hashes = num_hashes;
         if (m_num_hashes > 100) {
             m_num_hashes = 100;
         }
-        m_filter.fill(0); // initially fill with zeros
-    }
+        m_size = size;
+        m_filter.resize(m_size); // initially fill with zeros
+        std::fill(m_filter.begin(), m_filter.end(), 0);
+    }   
     void insert(pybind11::object item) {
         ensure_hashable(item);
         for (int i = 0; i < m_num_hashes; i++) {
-            size_t hash_val = (hash1(item) + i * hash2(item)) % N;
+            size_t hash_val = (hash1(item) + i * hash2(item)) % m_size;
             ++m_filter[hash_val];
         }
     }
     bool contains(pybind11::object item) {
         ensure_hashable(item);
         for (int i = 0; i < m_num_hashes; i++) {
-            size_t hash_val = (hash1(item) + i * hash2(item)) % N;
+            size_t hash_val = (hash1(item) + i * hash2(item)) % m_size;
              if (m_filter[hash_val] == 0) {
                 return false;
             }
@@ -47,7 +51,7 @@ public:
             return;
         }
         for (int i = 0; i < m_num_hashes; i++) {
-            size_t hash_val = (hash1(item) + i * hash2(item)) % N;
+            size_t hash_val = (hash1(item) + i * hash2(item)) % m_size;
             --m_filter[hash_val];
         }
     }
@@ -59,7 +63,7 @@ public:
 
         int min_count = std::numeric_limits<int>::max();
         for (int i = 0; i < m_num_hashes; i++) {
-            size_t hash_val = (hash1(item) + i * hash2(item)) % N;
+            size_t hash_val = (hash1(item) + i * hash2(item)) % m_size;
             min_count = std::min(min_count, m_filter[hash_val]);
         }
 
@@ -68,7 +72,8 @@ public:
 
 private:
     int m_num_hashes;
-    std::array<int, N> m_filter;
+    size_t m_size;
+    std::vector<int> m_filter;
 
     void ensure_hashable(const pybind11::object input) {
         try {
@@ -81,13 +86,13 @@ private:
     size_t hash1(const pybind11::object &input) const {
         pybind11::object hash_obj = pybind11::module::import("builtins").attr("hash")(input);
         long hash_value = hash_obj.cast<long>();
-        return std::hash<long>()(hash_value) % N;
+        return std::hash<long>()(hash_value) % m_size;
     }
 
     size_t hash2(const pybind11::object &input) const {
         pybind11::object hash_obj = pybind11::module::import("builtins").attr("hash")(input);
         long hash_value = hash_obj.cast<long>();
-        return (std::hash<long>()(hash_value) * 0xdeadbeef) % N;
+        return (std::hash<long>()(hash_value) * 0xdeadbeef) % m_size;
     }
 };
 #endif
@@ -104,6 +109,7 @@ template <typename T, std::size_t N>
 class CountingBloomFilter {
 public:
     CountingBloomFilter(int num_hashes) {
+        static_assert(N != 0, "N must be > 0");
         m_num_hashes = num_hashes;
         if (m_num_hashes > 100) {
             m_num_hashes = 100;
