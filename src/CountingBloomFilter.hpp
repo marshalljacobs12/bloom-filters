@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include <vector>
 #include <algorithm>
+#include <mutex>
 
 // for debugging
 #include <iostream>
@@ -116,13 +117,16 @@ public:
         }
         m_filter.fill(0); // initially fill with zeros
     }
+
     void insert(const T& item) {
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         for (int i = 0; i < m_num_hashes; i++) {
             size_t hash_val = (hash1(item) + i * hash2(item)) % N;
-            ++m_filter[hash_val];
+            m_filter[hash_val] = m_filter[hash_val] + 1;
         }
     }
-    bool contains(const T& item) const {
+    bool contains(const T& item) {
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         for (int i = 0; i < m_num_hashes; i++) {
             size_t hash_val = (hash1(item) + i * hash2(item)) % N;
             if (m_filter[hash_val] == 0) {
@@ -133,6 +137,7 @@ public:
     }
 
     void remove(const T& item) {
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         if (!contains(item)) {
             return;
         }
@@ -142,7 +147,8 @@ public:
         }
     }
 
-    int count(const T& item) const {
+    int count(const T& item) {
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         if (!contains(item)) {
             return 0;
         }
@@ -152,13 +158,13 @@ public:
             size_t hash_val = (hash1(item) + i * hash2(item)) % N;
             min_count = std::min(min_count, m_filter[hash_val]);
         }
-
         return min_count;
     }
 
 private:
     int m_num_hashes;
     std::array<int, N> m_filter;
+    std::recursive_mutex m_mutex;
 
     size_t hash1(const T &input) const {
         return std::hash<T>{}(input) % N;
