@@ -33,17 +33,16 @@ include(Warnings)
 # Check for LTO support.
 find_lto(CXX)
 
-add_subdirectory(extern/pybind11)
-include_directories(include)
 # --------------------------------------------------------------------------------
 #                         Locate files (change as needed).
 # --------------------------------------------------------------------------------
+include_directories(include)
+
 set(SOURCES          # All .cpp files in src/
     src/BloomFilter.hpp
     src/Bitmap.cpp
-    # src/BloomFilterPython.hpp
-    # src/my_module.cpp
 )
+
 # set(TESTFILES        # All .cpp files in tests/
 #     tests/main.cpp
 # )
@@ -54,31 +53,14 @@ set(LIBRARY_NAME bloomfilter)  # Default name for the library built from src/*.c
 # --------------------------------------------------------------------------------
 # Compile all sources into a library.
 add_library(${LIBRARY_NAME} OBJECT ${SOURCES})
-# target_link_libraries(${LIBRARY_NAME} PRIVATE pybind11::module)
-
 # Lib needs its header files, and users of the library must also see these (PUBLIC). (No change needed)
 target_include_directories(${LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(${LIBRARY_NAME} PUBLIC ${PROJECT_SOURCE_DIR}/src)
 
-set(TEST_SOURCES 
-  src/Bitmap.cpp
-  src/BloomFilterPython.hpp
-  src/my_module.cpp
-)
-
-# add_library(test1 MODULE ${TEST_SOURCES})
-
-# target_link_libraries(test1 PRIVATE pybind11::module)
-# target_include_directories(test1 PUBLIC ${PROJECT_SOURCE_DIR}/include)
-# target_include_directories(test1 PUBLIC ${PROJECT_SOURCE_DIR}/src)
-
-pybind11_add_module(my_module ${TEST_SOURCES})
-
-# pybind11_add_module(cmake_example src/main.cpp)
-
 # Set the compile options you want (change as needed).
 target_set_warnings(${LIBRARY_NAME} ENABLE ALL AS_ERROR ALL DISABLE Annoying)
 # target_compile_options(${LIBRARY_NAME} ... )  # For setting manually.
+
 
 # Add an executable for the file app/main.cpp.
 # If you add more executables, copy these lines accordingly.
@@ -98,3 +80,13 @@ set_target_properties(
 
 # Set up tests (see tests/CMakeLists.txt).
 add_subdirectory(tests)
+
+add_subdirectory(extern/pybind11) # CHECK IF CAN DELETE
+set(PYTHON_MODULE_SOURCES 
+  src/Bitmap.cpp
+  src/BloomFilter.hpp
+  src/bf.cpp
+)
+
+pybind11_add_module(bf ${PYTHON_MODULE_SOURCES})
+target_compile_definitions(bf PRIVATE -DINCLUDE_PYBIND=1)

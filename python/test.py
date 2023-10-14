@@ -1,8 +1,8 @@
-import my_module
+import bf
 
-bf = my_module.BloomFilter(1000, 3)
-bf.insert('hello')
-if bf.contains('hello'):
+bloom_filter = bf.BloomFilter(1000, 3)
+bloom_filter.insert('hello')
+if bloom_filter.contains('hello'):
     print('contains hello')
-if not bf.contains('goodbye'):
+if not bloom_filter.contains('goodbye'):
     print('does not contain goodbye')
