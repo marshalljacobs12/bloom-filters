@@ -1,6 +1,8 @@
 import pytest
 import bf
 from .helpers import Hashable
+import threading
+import time
 
 def test_counting_bloom_filter_constructor_int():
     counting_bloom_filter = bf.CountingBloomFilter(100, 3)
@@ -73,3 +75,42 @@ def test_counting_bloom_filter_contains_false_positive():
     for i in range(10000):
         counting_bloom_filter.insert(i)
     assert counting_bloom_filter.contains(10001) == True
+
+def test_counting_bloom_filter_thread_safety_insert():
+    counting_bloom_filter = bf.CountingBloomFilter(10000, 10)
+    threads = []
+
+    def worker():
+        for _ in range(1000):
+            counting_bloom_filter.insert(42)
+    
+    for _ in range(4):
+        thread = threading.Thread(target=worker)
+        thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
+    
+    assert counting_bloom_filter.count(42) == 4000
+
+def test_counting_bloom_filter_thread_safety_remove():
+    counting_bloom_filter = bf.CountingBloomFilter(10000, 10)
+    threads = []
+
+    for _ in range(4000):
+        counting_bloom_filter.insert(42)
+
+    def worker():
+        for _ in range(1000):
+            counting_bloom_filter.remove(42)
+    
+    for _ in range(4):
+        thread = threading.Thread(target=worker)
+        thread.start()
+        threads.append(thread)
+
+    for thread in threads:
+        thread.join()
+    
+    assert counting_bloom_filter.count(42) == 0

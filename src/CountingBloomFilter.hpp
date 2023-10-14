@@ -30,6 +30,7 @@ public:
     }   
     void insert(pybind11::object item) {
         ensure_hashable(item);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         for (int i = 0; i < m_num_hashes; i++) {
             size_t hash_val = (hash1(item) + i * hash2(item)) % m_size;
             ++m_filter[hash_val];
@@ -37,6 +38,7 @@ public:
     }
     bool contains(pybind11::object item) {
         ensure_hashable(item);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         for (int i = 0; i < m_num_hashes; i++) {
             size_t hash_val = (hash1(item) + i * hash2(item)) % m_size;
              if (m_filter[hash_val] == 0) {
@@ -48,6 +50,7 @@ public:
 
     void remove(pybind11::object item) {
         ensure_hashable(item);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         if (!contains(item)) {
             return;
         }
@@ -58,6 +61,8 @@ public:
     }
 
     int count(pybind11::object item) {
+        ensure_hashable(item);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         if (!contains(item)) {
             return 0;
         }
@@ -75,7 +80,8 @@ private:
     int m_num_hashes;
     size_t m_size;
     std::vector<int> m_filter;
-
+    std::recursive_mutex m_mutex;
+    
     void ensure_hashable(const pybind11::object input) {
         try {
             pybind11::hash(input);
